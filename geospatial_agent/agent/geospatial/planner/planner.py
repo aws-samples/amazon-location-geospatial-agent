@@ -49,7 +49,8 @@ def _gen_plan_graph_code(llm: LLM, task_definition: str, data_locations_instruct
                                     graph_requirements=graph_requirements,
                                     graph_reply_example=_graph_reply_example,
                                     data_locations_instructions=data_locations_instructions,
-                                    assistant_role="Assistant")
+                                    assistant_role="Assistant",
+                                    stop=[HUMAN_STOP_SEQUENCE])
     # Use the LLM to generate a plan graph code
     graph_plan_code = extract_code(graph_plan_response)
     return graph_plan_code

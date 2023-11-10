@@ -146,8 +146,9 @@ class Solver:
             operation_name=node_name,
             pre_requirements=operation_requirement_str,
             operation_properties=op_properties_str,
-            assistant_role=ASSISTANT_ROLE
-        )
+            assistant_role=ASSISTANT_ROLE,
+            stop=[HUMAN_STOP_SEQUENCE]
+        ).strip()
 
         operation_requirement_json = extract_content_xml("json", req_gen_response)
         operation_requirement_list: List[str] = json.loads(operation_requirement_json)
@@ -213,8 +214,9 @@ class Solver:
             operation_requirements=operation_requirements_str,
             ancestor_operation_code=ancestor_op_nodes_code,
             descendant_operations_definition=str(descendant_op_node_defs),
-            assistant_role=ASSISTANT_ROLE
-        )
+            assistant_role=ASSISTANT_ROLE,
+            stop=[HUMAN_STOP_SEQUENCE]
+        ).strip()
 
         operation_code = extract_code(code_gen_response)
 

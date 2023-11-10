@@ -1,7 +1,7 @@
 import json
 from typing import List, Any, Optional
 
-from langchain import PromptTemplate
+from langchain import PromptTemplate, LLMChain
 from pydantic import BaseModel, ConfigDict
 from pydispatch import dispatcher
 
@@ -106,15 +106,17 @@ class ActionSummarizer:
             if len(gdf_str) > 4000:
                 gdf_str = gdf_str[:4000]
 
-            file_summary_prompt = file_summary_template.format(role_intro=_ROLE_INTRO,
-                                                               human_role=HUMAN_ROLE,
-                                                               requirements=requirements_str,
-                                                               action=action,
-                                                               columns=item.column_names,
-                                                               table=gdf_str,
-                                                               assistant_role=ASSISTANT_ROLE)
-
-            file_summary = self.llm.predict(text=file_summary_prompt, stop=[HUMAN_STOP_SEQUENCE]).strip()
+            chain = LLMChain(llm=self.llm, prompt=file_summary_template)
+            file_summary = chain.run(
+                role_intro=_ROLE_INTRO,
+                human_role=HUMAN_ROLE,
+                requirements=requirements_str,
+                action=action,
+                columns=item.column_names,
+                table=gdf_str,
+                assistant_role=ASSISTANT_ROLE,
+                stop=[HUMAN_STOP_SEQUENCE]
+            ).strip()
             item.file_summary = file_summary
 
         return file_summaries
@@ -128,14 +130,19 @@ class ActionSummarizer:
         requirements_str = "\n".join(
             [f"{index + 1}. {requirement}" for index, requirement in enumerate(_READ_FILE_REQUIREMENTS)])
         read_file_template: PromptTemplate = PromptTemplate.from_template(_READ_FILE_PROMPT)
-        read_file_prompt = read_file_template.format(role_intro=_ROLE_INTRO,
-                                                     human_role=HUMAN_ROLE,
-                                                     requirements=requirements_str,
-                                                     session_id=session_id,
-                                                     storage_mode=storage_mode,
-                                                     assistant_role=ASSISTANT_ROLE,
-                                                     file_urls=file_urls_str)
-        read_file_code_response = self.llm.predict(text=read_file_prompt, stop=[HUMAN_STOP_SEQUENCE]).strip()
+
+        chain = LLMChain(llm=self.llm, prompt=read_file_template)
+        read_file_code_response = chain.run(
+            role_intro=_ROLE_INTRO,
+            human_role=HUMAN_ROLE,
+            requirements=requirements_str,
+            session_id=session_id,
+            storage_mode=storage_mode,
+            assistant_role=ASSISTANT_ROLE,
+            file_urls=file_urls_str,
+            stop=[HUMAN_STOP_SEQUENCE]
+        ).strip()
+
         read_file_code = extract_code(read_file_code_response)
         return read_file_code
 
@@ -177,13 +184,15 @@ class ActionSummarizer:
         requirements_str = "\n".join(
             [f"{index + 1}. {requirement}" for index, requirement in enumerate(_ACTION_SUMMARY_REQUIREMENTS)])
 
-        filepaths_extract_prompt = filepaths_extract_template.format(role_intro=_ROLE_INTRO,
-                                                                     human_role=HUMAN_ROLE,
-                                                                     requirements=requirements_str,
-                                                                     assistant_role=ASSISTANT_ROLE,
-                                                                     message=user_input)
-
-        action_summary = self.llm.predict(text=filepaths_extract_prompt, stop=[HUMAN_STOP_SEQUENCE]).strip()
+        chain = LLMChain(llm=self.llm, prompt=filepaths_extract_template)
+        action_summary = chain.run(
+            role_intro=_ROLE_INTRO,
+            human_role=HUMAN_ROLE,
+            requirements=requirements_str,
+            assistant_role=ASSISTANT_ROLE,
+            message=user_input,
+            stop=[HUMAN_STOP_SEQUENCE]
+        ).strip()
 
         try:
             # JSON parse action_summary into ActionSummary class object
