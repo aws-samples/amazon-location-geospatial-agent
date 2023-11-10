@@ -29,7 +29,7 @@ _graph_requirement_list = [
     "First operations are data loading or collection, and the last operation output is the final answer.",
     "Use goepandas for spatial data if the goal is to make a map or visualization.",
     "Succinctly name all nodes.",
-    "Produce the most concise graph possible.",
+    "Produce a concise graph with minimum amount of steps.",
     "Nodes should have these attributes: node_type (data or operation), data_path (only for data node), operation_type (only for operation node), and description.",
     "operation_type is a single word tag to categorize the operations. For example, visualization, map, plot, load, transform, and spatial_join.",
     "Do not generate code to implement the steps.",
