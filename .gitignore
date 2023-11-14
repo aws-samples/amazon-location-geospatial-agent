@@ -26,3 +26,6 @@ geospatial-agent-session-storage
 .run
 
 .coverage
+
+# rtx configurations
+.rtx.toml
