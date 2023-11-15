@@ -4,7 +4,7 @@ Amazon Location Geospatial Agent is an autonomous agent built with the power of 
 model Anthropic Claude 2 as its primary model. It is a Plan and Solve agent.
 
 ## Getting Started
-First, we need install all dependencies. This is not a Brazilified package. This agent uses `poetry` to manage dependencies. 
+First, we need install all dependencies. This agent uses `poetry` to manage dependencies. 
 `poetry` is a dependency management and packaging tool for Python.
 
 First, we need to install poetry. If you are on OSX

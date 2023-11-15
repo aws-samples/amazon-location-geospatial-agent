@@ -16,7 +16,6 @@ from geospatial_agent.shared.shim import get_shim_imports
 from geospatial_agent.shared.utils import extract_code
 
 
-# Exception class with a message and original exception for ActionSummarizer errors
 class ActionSummarizerException(Exception):
     def __init__(self, message: str):
         self.message = message
@@ -122,11 +121,10 @@ class ActionSummarizer:
         return file_summaries
 
     def _gen_file_read_code(self, action_context: ActionContext, session_id: str, storage_mode: str) -> str:
-        # Creating a numbered string list of file url for each item in the file_urls list
         file_paths = action_context.file_paths
         file_urls_str = "\n".join(
             [f"{index + 1}. {file_url}" for index, file_url in enumerate(file_paths)])
-        # Creating a numbered string list of requirements from _READ_FILE_REQUIREMENTS
+
         requirements_str = "\n".join(
             [f"{index + 1}. {requirement}" for index, requirement in enumerate(_READ_FILE_REQUIREMENTS)])
         read_file_template: PromptTemplate = PromptTemplate.from_template(_READ_FILE_PROMPT)
@@ -152,7 +150,6 @@ class ActionSummarizer:
         output = exec(assembled_code, globals(), globals())
         _globals = globals()
 
-        # First, lets check for the dataframes we expect
         dataframes = _globals[DATA_FRAMES_VARIABLE_NAME]
         file_summaries = [FileSummary(**data) for data in dataframes]
 
@@ -160,9 +157,6 @@ class ActionSummarizer:
             raise ActionSummarizerException(
                 message=f"Failed to generate file summaries from executing code. "
                         f"No dataframes found in globals")
-
-        # dataframes is a list of python DataFileSummary with attributes : file_url, data_frame, column_names.
-        # We will validate that each item in the list has all the keys, and all the values.
 
         for item in file_summaries:
             if not isinstance(item.file_url, str):
@@ -177,10 +171,7 @@ class ActionSummarizer:
         return file_summaries
 
     def _extract_action_context(self, user_input: str) -> ActionContext:
-        """Returns a filepaths from user prompt using LLM"""
         filepaths_extract_template: PromptTemplate = PromptTemplate.from_template(_ACTION_SUMMARY_PROMPT)
-
-        # Creating a numbered string list of requirements from _FILE_PATH_EXTRACT_REQUIREMENTS
         requirements_str = "\n".join(
             [f"{index + 1}. {requirement}" for index, requirement in enumerate(_ACTION_SUMMARY_REQUIREMENTS)])
 
@@ -195,7 +186,6 @@ class ActionSummarizer:
         ).strip()
 
         try:
-            # JSON parse action_summary into ActionSummary class object
             action_summary_obj = ActionContext.parse_raw(action_summary)
             return action_summary_obj
         except json.JSONDecodeError as e:

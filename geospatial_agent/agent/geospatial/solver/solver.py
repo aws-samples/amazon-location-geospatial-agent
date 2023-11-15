@@ -127,7 +127,7 @@ class Solver:
         task_def = self.task_def.strip("\n").strip()
         op_properties = [
             f'The function description is: {op_node.description}',
-            f'The type of work done in this function is {op_node.operation_type}',
+            f'The type of work done in this function is: {op_node.operation_type}',
             f'This function is one step to solve the question/task: {task_def}'
         ]
 

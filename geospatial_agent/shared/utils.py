@@ -4,7 +4,6 @@ import networkx
 from pydot import Dot
 
 
-# A code extraction exception type with a message.
 class ExtractionException(Exception):
     def __init__(self, message: str):
         self.message = message

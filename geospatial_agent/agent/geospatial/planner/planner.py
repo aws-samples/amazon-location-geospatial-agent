@@ -10,7 +10,6 @@ from geospatial_agent.shared.prompts import GIS_AGENT_ROLE_INTRO, HUMAN_STOP_SEQ
 from geospatial_agent.shared.utils import extract_code
 
 
-# A planner exception type with a message and an original exception.
 class PlannerException(Exception):
     def __init__(self, message: str):
         self.message = message
@@ -58,13 +57,6 @@ def _gen_plan_graph_code(llm: LLM, task_definition: str, data_locations_instruct
 
 def _get_graph_requirements() -> str:
     """Returns planning graph requirements list"""
-
-    # Generating requirements for generating the graph
-    # For each line in _graph_requirement_list, appending a new line to the graph_requirement_str
-    # Also, adding graph saving requirement
-
-    # graph_save_requirement = f"Save the network into GraphML format. Save it at: {graph_file}"
     requirements = _graph_requirement_list.copy()
-    # requirements.append(graph_save_requirement)
     graph_requirement_str = '\n'.join([f"{idx + 1}. {line}" for idx, line in enumerate(requirements)])
     return graph_requirement_str

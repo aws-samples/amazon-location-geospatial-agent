@@ -14,10 +14,9 @@ def get_claude_v2(max_tokens_to_sample=8100, temperature=0.001):
                   })
     return llm
 
+
 def get_bedrock_client() -> BaseClient:
     session = boto3.Session()
-
-    # Otherwise, return a client with the default credential
     cfg = Config(retries={'max_attempts': 10, 'mode': 'adaptive'})
     client: BaseClient = session.client("bedrock-runtime", region_name="us-east-1", config=cfg)
     return client

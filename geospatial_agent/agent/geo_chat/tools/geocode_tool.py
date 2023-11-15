@@ -14,7 +14,6 @@ def geocode_tool(location_client=None, place_index_name: str = ""):
     if not place_index_name:
         place_index_name = get_place_index_name()
 
-    # Doing pydantic validation for location and place_index_name.
     @tool(GEOCODE_TOOL)
     def geocode_tool_func(query: str) -> str:
         """\
@@ -38,7 +37,6 @@ pair of coordinates following the format [longitude, latitude] that represents t
 
             return response_string
         except Exception as e:
-            # We can not stop the execution here, we need to keep conversing.
             dispatcher.send(signal=GEOCODE_TOOL_FAILED, sender=GEOCODE_TOOL, event_data=e)
             return "Observation: The tool did not find any results."
 

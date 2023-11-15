@@ -12,14 +12,12 @@ from geospatial_agent.shared.bedrock import get_claude_v2
 from geospatial_agent.shared.shim import LocalStorage
 
 
-# A GISAgent exception class with message and original exception. Original exception can be None
 class GISAgentException(Exception):
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
 
 
-# A GISAgent response class with graph plan code, graph object and repl output.
 class GISAgentResponse:
     def __init__(self, graph_plan_code, graph, repl_output, op_defs, assembled_code):
         self.graph_plan_code = graph_plan_code
@@ -45,7 +43,7 @@ class GeospatialAgent:
 
     def invoke(self, action_summary: ActionSummary, session_id: str) -> GISAgentResponse:
         try:
-            # Generating a task name from the action summary action
+            # INFO: Generating a task name from the action summary action
             task_name = gen_task_name(self.llm, action_summary.action)
             dispatcher.send(signal=SIGNAL_TASK_NAME_GENERATED,
                             sender=SENDER_GEOSPATIAL_AGENT,
@@ -56,7 +54,7 @@ class GeospatialAgent:
 
             data_locations_instructions = self._get_data_locations_instructions(action_summary)
 
-            # Generating the graph plan code
+            # INFO: Generating the graph plan to write code
             graph_plan_code = gen_plan_graph(self.llm,
                                              task_definition=action_summary.action,
                                              data_locations_instructions=data_locations_instructions)
@@ -70,7 +68,7 @@ class GeospatialAgent:
                     event_data=graph_plan_code
                 ))
 
-            # Executing the graph plan code and get the graph object and the repl output
+            # INFO: Executing the graph plan code and get the graph object and the repl output
             graph, repl_output = self._execute_plan_graph_code(graph_plan_code)
             graph_file_abs_path = self._write_local_graph_file(graph, session_id=session_id, task_name=task_name)
 
@@ -134,18 +132,13 @@ class GeospatialAgent:
         return data_locations_instructions
 
     def _write_local_graph_file(self, graph, session_id: str, task_name: str) -> str:
-        # Getting a file path to store the generated graph file
         graph_file_path = self.local_storage.get_generated_file_url(
             file_path="plan_graph.graphml", session_id=session_id, task_name=task_name)
 
-        # Getting the parent directory of the graph file path
         parent_dir = os.path.dirname(graph_file_path)
-
-        # Creating the parent directory if it does not exist
         if not os.path.exists(parent_dir):
             os.makedirs(parent_dir)
 
-        # Writing the graph to a graphml file
         networkx.write_graphml(graph, graph_file_path, named_key_ids=False)
         return os.path.abspath(graph_file_path)
 

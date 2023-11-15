@@ -1,7 +1,7 @@
 _graph_generation_instructions = """
 Generate a graph, the data structure only, whose nodes are 
 1. A series of consecutive steps and 
-2. Framework to achieve the following goal:
+2. Framework to achieve the following goal
 """
 
 _graph_reply_example = r"""
@@ -10,12 +10,14 @@ import networkx as nx
 G = nx.DiGraph()
 # Add nodes and edges for the graph
 # Load covid 19 shapefile from remote source
-G.add_node("covid_19_shp_url", node_type="data", data_path="https://genai-chatbotstack.s3.amazonaws.com/data/covid_19_shapefile.zip", description="Covid 19 shapefile URL")
+G.add_node("covid_19_shp_url", node_type="data", data_path="https://gepspatialagent.s3.amazonaws.com/data/covid_19_shapefile.zip", description="Covid 19 shapefile URL")
 G.add_node("load_covid_19_shp", node_type="operation", description="Load Covid 19 shapefile")
 G.add_edge("covid_19_shp_url", "load_covid_19_shp")
 G.add_node("covid_19_gdf", node_type="data", description="Covid 19 shapefile GeoDataFrame")
 G.add_edge("load_covid_19_shp", "covid_19_gdf")
+
 ...
+
 ```
 """
 
@@ -45,7 +47,7 @@ Your task:
 {graph_generation_instructions} {task_definition}
 
 
-Your reply needs to meet these requirements:
+Your reply needs to meet the following requirements:
 {graph_requirements}
 
 
@@ -64,8 +66,8 @@ _task_name_generation_prompt = r"""
 
 1. Do not use spaces.
 2. Do not use slashes or any escape characters.
-3. Use underscore (_) to connect multiple worlds if necessary.
-4. Produce a all lowercase, concise and meaningful name.
+3. Use underscore (_) to connect multiple words if necessary.
+4. Produce a lowercase, concise, and meaningful name.
 5. Only return the folder name.
 
 The task definition is:

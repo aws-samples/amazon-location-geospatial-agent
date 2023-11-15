@@ -43,7 +43,6 @@ class OperationsParser:
     def __init__(self, graph: networkx.DiGraph):
         self.graph = graph
 
-        # Initializing the class with all operations found in the solution graph
         self.op_node_names = self._get_operation_node_names()
         self.operation_nodes = self._get_operation_nodes(self.op_node_names)
         self.output_node_names = self._get_output_node_names()
@@ -154,9 +153,9 @@ class OperationsParser:
         """
 
         # INFO: To generate a function definition from the solution graph, we need to find the parameters of the
-        # function, and the return value.
+        # function, and the return value. We start with looking for the predecessors of the node.
+        # Because the parameters are the predecessors.
 
-        # We start with looking for the predecessors of the node. Because the parameters are the predecessors.
         predecessors = self.graph.predecessors(node)
 
         param_default_str = ''
@@ -166,9 +165,10 @@ class OperationsParser:
         for data_node in predecessors:
             param_node = self.graph.nodes[data_node]
 
-            # Parameter node might have a data_path attribute. If it does, we need to use that.
-            # For example, a URL or  file path.
-            # Otherwise, we just use the node name as parameter default value.
+            # INFO: The parameter node may have a data_path attribute specifying the location of its data,
+            # like a URL or filepath, which should be used if present; otherwise the node name can be
+            # used as the default parameter value.
+
             data_path = param_node.get(NODE_DATA_PATH_ATTRIBUTE, '')
             param_names.add(data_node)
 
