@@ -47,12 +47,11 @@ Before testing the agent, we will need to create the following the backing AWS a
 2. An Amazon Location Map Resource created from Amazon Location Console.
 3. An Amazon Location API Key created from Amazon Location Console. This API Key should have access permissions to 1 and 2.
 
-After they are created, open the `Makefile` and under `.EXPORT_ALL_VARIABLES:` sections, set the following env variables:
-```makefile
-.EXPORT_ALL_VARIABLES:
-API_KEY_NAME=AgentAPIKey
-MAP_NAME=AgentMap
-PLACE_INDEX_NAME=AgentPlaceIndex
+After they are created, open `.env` file and set the following env variables:
+```env
+API_KEY_NAME=<Your Amazon Location API Key of for Places and Maps>
+MAP_NAME=<Your Amazon Location Maps resource name>
+PLACE_INDEX_NAME=<Your Amazon Location Place Index resource name>
 ```
 
 As a default, a set of placeholders are used.
@@ -69,10 +68,22 @@ Now we have all the resources we need!
 The agent runs locally in your machine. Use local AWS credentials that has access to Amazon Bedrock InvokeModel API.
 Additionally, it should have access to Amazon Location SearchPlaceIndexForText API.
 
+
+### Downloading the data
+In this sample, we will generate a heatmap from Airbnb database. Download
+[the Airbnb 2019 Open Dataset for New York from here](https://www.kaggle.com/datasets/dgomonov/new-york-city-airbnb-open-data?select=AB_NYC_2019.csv).
+Store the file inside the `data` folder.
+
+Then run the following to crete a session. We are using a guid named `3c18d48c-9c9b-488f-8229-e2e8016fa851` 
+as example session id. This will create a session with `AB_NYC_2019.csv` stored inside `data` folder.
+
+```bash
+SESSION_ID="3c18d48c-9c9b-488f-8229-e2e8016fa851" make create-session
+```
+
 ### Starting the agent
-The agent runs locally and needs a local session store. We will see that soon in action. Furthermore, the agent
-can run inside docker or outside docker. We recommend running the agent inside a docker container because it 
-generates code. And to keep the user environment safe for any unexpected side effect, docker is used.
+The agent can run inside a docker container or outside docker container. We recommend running the agent inside a docker container. 
+This way, the generated code can not create any unexpected side effect.
 
 We can build the docker image for the agent by:
 
@@ -88,31 +99,30 @@ docker run --rm -it -v ~/.aws:/root/.aws --entrypoint bash agent
 
 Then, start the agent using inside docker:
 ```bash
-poetry run agent
+poetry run agent --session-id 3c18d48c-9c9b-488f-8229-e2e8016fa851
 ```
 
-With these commands we have not given the agent a session id. A session id is a GUID the agent uses
-to keep all data and generated content for a session inside a folder. After you invoke the session,
-you will see a folder named `geospatial-agent-session-storage` being created.
+The agent will write all generated content under `geospatial-agent-session-storage` folder.
 
-Inside this folder, there will be sub-folder for each session. If you want to create a session yourself
-use:
-
-```bash
-SESSION_ID="3c18d48c-9c9b-488f-8229-e2e8016fa851" make create-session
+Now, when prompted by the agent, we can use the following input to generate the heatmap.
+```
+I've uploaded the file AB_NYC_2019.csv. Draw a heatmap of Airbnb listing price
 ```
 
-I used `3c18d48c-9c9b-488f-8229-e2e8016fa851` as a placeholder. You can use your own session id.
+And then, let the agent do its thing!
 
-For our testing run we will generate a heatmap from Airbnb database. To do that, we will have to copy
-`data/airbnb_listings_price.csv` to the `data` subfolder under the session folder.
+### Limitations
+This agent can work on datasets other than the one used for training, but its performance is not guaranteed to be perfect 
+on all datasets and tasks.
 
-For example in this case, that folder will be `geospatial-agent-session-storage/3c18d48c-9c9b-488f-8229-e2e8016fa851/data`.
-After copying `data/airbnb_listings_price.csv` to this folder we can ask the agent to create a heatmap by putting 
-this input:
+The agent can generate high-level plans to solve problems. However, to translate those plans into executable code, 
+it relies on the Claude 2 model which is good at writing Python code using built-ins but has limitations. 
+Claude 2 scored 74% on the HumanEval Python test.
 
-```
-I've uploaded the file airbnb_listings_price.csv. Draw a heatmap of Airbnb listing price
-```
+To reliably write code dealing with geospatial data, the agent would need additional training focused on libraries 
+like geopandas, matplotlib, and pydeck. In particular, knowledge of geopandas is crucial for spatial joins.
 
-And then, let the agent do it's thing!
+While the agent can plan spatial joins, it often fails to write functioning geopandas code to join columns from two 
+dataframes. Common issues include data type mismatches and coordinate system incompatibilities. We tried addressing 
+these with prompting, but without further tuning or a model specialized for geopandas, success rates across diverse 
+datasets will be limited.
