@@ -1,7 +1,7 @@
 ## Amazon Location Geospatial Agent
 
-Amazon Location Geospatial Agent is an autonomous agent built with the power of LLMs. This agent uses Amazon Bedrock
-model Anthropic Claude 2 as its primary model. It is a Plan and Solve agent.
+This repository provides an example agent that can generate a heatmap of Airbnb listings in New York City when prompted. 
+The agent utilizes plan-and-solve prompting with Anthropic's Claude 2 model from Amazon Bedrock.
 
 ## Getting Started
 First, we need install all dependencies. This agent uses `poetry` to manage dependencies. 
