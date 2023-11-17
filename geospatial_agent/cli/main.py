@@ -1,3 +1,5 @@
+import os
+
 import click
 import langchain
 from pydispatch import dispatcher
@@ -39,7 +41,8 @@ def get_chatbot_response(user_input: str, session_id: str, verbose: bool, storag
 @click.command()
 @click.option('--verbose', is_flag=True, help='Enable verbose mode')
 @click.option('--session-id', help='Session id of the conversation')
-def chat(session_id: str, verbose: bool):
+@click.option('--profile', help='AWS Profile to use')
+def chat(session_id: str, verbose: bool, profile: str):
     """
     Simple conversational chatbot running in the terminal.
     Type your message, press Enter, and the chatbot will respond.
@@ -54,6 +57,11 @@ def chat(session_id: str, verbose: bool):
         click.echo(f"Agent: Creating a new session {session_id}")
         storage = LocalStorage()
         storage.create_session_storage(session_id=session_id)
+
+    # If profile is not none or empty, set _PROFILE to profile
+    if profile is not None and profile != "":
+        os.environ["AWS_PROFILE"] = profile
+        click.echo(f"Agent: Using AWS profile: {profile}")
 
     def print_signal(sender, event_data):
         # Check if event_data is instance of Exception

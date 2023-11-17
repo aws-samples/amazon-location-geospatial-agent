@@ -102,6 +102,11 @@ Then, start the agent using inside docker:
 poetry run agent --session-id 3c18d48c-9c9b-488f-8229-e2e8016fa851
 ```
 
+If you want to use an AWS profile, there is a `--profile` flag available
+```bash
+poetry run agent --session-id 3c18d48c-9c9b-488f-8229-e2e8016fa851 --profile some-aws-profile
+```
+
 The agent will write all generated content under `geospatial-agent-session-storage` folder.
 
 Now, when prompted by the agent, we can use the following input to generate the heatmap.
