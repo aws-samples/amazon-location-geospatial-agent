@@ -9,4 +9,4 @@ test:
 create-session:
 	mkdir -p geospatial-agent-session-storage/$(SESSION_ID)/data
 	mkdir -p geospatial-agent-session-storage/$(SESSION_ID)/generated
-	cp data/AB_NYC_2019.csv geospatial-agent-session-storage/$(SESSION_ID)/data
+	cp data/$(FILE_NAME) geospatial-agent-session-storage/$(SESSION_ID)/data

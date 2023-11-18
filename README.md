@@ -71,14 +71,19 @@ Additionally, it should have access to Amazon Location SearchPlaceIndexForText A
 
 ### Downloading the data
 In this sample, we will generate a heatmap from Airbnb database. Download
-[the Airbnb 2019 Open Dataset for New York from here](https://www.kaggle.com/datasets/dgomonov/new-york-city-airbnb-open-data?select=AB_NYC_2019.csv).
+[the Airbnb 2023 Open Dataset for New York from here](http://data.insideairbnb.com/united-states/ny/new-york-city/2023-10-01/visualisations/listings.csv).
 Store the file inside the `data` folder.
 
+```bash
+wget http://data.insideairbnb.com/united-states/ny/new-york-city/2023-10-01/visualisations/listings.csv
+cp listings.csv data/listings.csv
+```
+
 Then run the following to crete a session. We are using a guid named `3c18d48c-9c9b-488f-8229-e2e8016fa851` 
-as example session id. This will create a session with `AB_NYC_2019.csv` stored inside `data` folder.
+as example session id. This will create a session with `listings.csv` stored inside `data` folder.
 
 ```bash
-SESSION_ID="3c18d48c-9c9b-488f-8229-e2e8016fa851" make create-session
+SESSION_ID="3c18d48c-9c9b-488f-8229-e2e8016fa851" FILE_NAME="listings.csv" make create-session
 ```
 
 ### Starting the agent
@@ -111,7 +116,7 @@ The agent will write all generated content under `geospatial-agent-session-stora
 
 Now, when prompted by the agent, we can use the following input to generate the heatmap.
 ```
-I've uploaded the file AB_NYC_2019.csv. Draw a heatmap of Airbnb listing price
+I've uploaded the file listings.csv. Draw a heatmap of Airbnb listing price.
 ```
 
 And then, let the agent do its thing!

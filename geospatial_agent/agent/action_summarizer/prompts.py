@@ -55,14 +55,14 @@ Storage Mode: {storage_mode}
 File Urls:
 {file_urls}
 
-
+As
 {assistant_role}:
 """
 
 # Generate Data Summary #
 
 _DATA_SUMMARY_REQUIREMENTS = [
-    "The summary should be at maximum three sentences.",
+    "The summary should be at maximum two sentences.",
     "The first sentence should be summary of the data in the table from the aspect of the user action.",
     "If there is no geometry column in the table, the second sentence should note column names that can be used to generate a geometry column in geopandas.",
     "Write summary without any extra surrounding text."
