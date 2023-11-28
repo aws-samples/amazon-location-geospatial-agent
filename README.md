@@ -136,3 +136,6 @@ While the agent can plan spatial joins, it often fails to write functioning geop
 dataframes. Common issues include data type mismatches and coordinate system incompatibilities. We tried addressing 
 these with prompting, but without further tuning or a model specialized for geopandas, success rates across diverse 
 datasets will be limited.
+
+This agent relies on generative AI, which has inherent limitations. Retrying once or twice may yield better results 
+if an interaction is unsatisfactory.

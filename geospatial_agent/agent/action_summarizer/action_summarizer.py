@@ -9,7 +9,7 @@ from geospatial_agent.agent.action_summarizer.prompts import _ACTION_SUMMARY_PRO
     _READ_FILE_PROMPT, _READ_FILE_REQUIREMENTS, _ACTION_SUMMARY_REQUIREMENTS, DATA_FRAMES_VARIABLE_NAME, \
     _DATA_SUMMARY_REQUIREMENTS, _DATA_SUMMARY_PROMPT
 from geospatial_agent.agent.shared import AgentSignal, EventType, SIGNAL_ACTION_CONTEXT_GENERATED, \
-    SENDER_ACTION_SUMMARIZER, SIGNAL_FILE_READ_CODE_GENERATED, SIGNAL_FILE_READ_CODE_EXECUTED
+    SENDER_ACTION_SUMMARIZER, SIGNAL_FILE_READ_CODE_GENERATED, SIGNAL_FILE_READ_CODE_EXECUTED, execute_assembled_code
 from geospatial_agent.shared.bedrock import get_claude_v2
 from geospatial_agent.shared.prompts import HUMAN_ROLE, ASSISTANT_ROLE, HUMAN_STOP_SEQUENCE
 from geospatial_agent.shared.shim import get_shim_imports
@@ -147,8 +147,7 @@ class ActionSummarizer:
     @staticmethod
     def _gen_file_summaries_from_executing_code(code: str) -> List[FileSummary]:
         assembled_code = f'{get_shim_imports()}\n{code}'
-        output = exec(assembled_code, globals(), globals())
-        _globals = globals()
+        output, _globals = execute_assembled_code(assembled_code)
 
         dataframes = _globals[DATA_FRAMES_VARIABLE_NAME]
         file_summaries = [FileSummary(**data) for data in dataframes]

@@ -7,7 +7,8 @@ from geospatial_agent.agent.action_summarizer.action_summarizer import ActionSum
 from geospatial_agent.agent.geospatial.planner.planner import gen_plan_graph, gen_task_name
 from geospatial_agent.agent.geospatial.solver.solver import Solver
 from geospatial_agent.agent.shared import AgentSignal, EventType, SIGNAL_ASSEMBLED_CODE_EXECUTED, \
-    SENDER_GEOSPATIAL_AGENT, SIGNAL_GRAPH_CODE_GENERATED, SIGNAL_TASK_NAME_GENERATED, SIGNAL_ASSEMBLED_CODE_EXECUTING
+    SENDER_GEOSPATIAL_AGENT, SIGNAL_GRAPH_CODE_GENERATED, SIGNAL_TASK_NAME_GENERATED, SIGNAL_ASSEMBLED_CODE_EXECUTING, \
+    execute_assembled_code
 from geospatial_agent.shared.bedrock import get_claude_v2
 from geospatial_agent.shared.shim import LocalStorage
 
@@ -19,15 +20,15 @@ class GISAgentException(Exception):
 
 
 class GISAgentResponse:
-    def __init__(self, graph_plan_code, graph, repl_output, op_defs, assembled_code):
+    def __init__(self, graph_plan_code, graph, repl_output, op_defs,
+                 assembled_code, assembled_code_output, assembled_code_file_path):
         self.graph_plan_code = graph_plan_code
         self.graph = graph
-        self.repl_output = repl_output
-        self.graph_plan_code = graph_plan_code
+        self.graph_plan_code_output = repl_output
         self.assembled_code = assembled_code
-        self.graph = graph
-        self.repl_output = repl_output
         self.op_defs = op_defs
+        self.assembled_code_output = assembled_code_output
+        self.assembled_code_file_path = assembled_code_file_path
 
 
 class GeospatialAgent:
@@ -95,7 +96,7 @@ class GeospatialAgent:
             code_file_abs_path = self._write_local_code_file(assembled_code=assembled_code, session_id=session_id,
                                                              task_name=task_name)
 
-            code_output = self._execute_assembled_code(assembled_code)
+            code_output, _ = execute_assembled_code(assembled_code)
             if code_output is not None:
                 dispatcher.send(signal=SIGNAL_ASSEMBLED_CODE_EXECUTED,
                                 sender=SENDER_GEOSPATIAL_AGENT,
@@ -109,7 +110,10 @@ class GeospatialAgent:
                 graph=graph,
                 repl_output=repl_output,
                 op_defs=op_defs,
-                assembled_code=assembled_code)
+                assembled_code=assembled_code,
+                assembled_code_output=code_output,
+                assembled_code_file_path=code_file_abs_path,
+            )
         except Exception as e:
             raise GISAgentException(message="Error occurred while executing the graph plan code") from e
 
@@ -151,15 +155,8 @@ class GeospatialAgent:
         )
 
     @staticmethod
-    def _execute_assembled_code(assembled_code):
-        """Executes the assembled code and returns the output."""
-        output = exec(assembled_code, globals(), globals())
-        return output
-
-    @staticmethod
     def _execute_plan_graph_code(graph_plan_code) -> tuple[networkx.DiGraph, str]:
         """Returns the plan graph object by executing the graph plan code."""
-        output = exec(graph_plan_code, globals(), globals())
-        _globals = globals()
+        output, _globals = execute_assembled_code(graph_plan_code)
         graph: networkx.DiGraph = _globals['G']
         return graph, output
