@@ -39,6 +39,9 @@ The return is freeform string or a URL to the result of the analysis."""
             user_input=user_input, session_id=session_id, storage_mode=storage_mode)
         output = gis_agent.invoke(action_summary=action_summary, session_id=session_id)
 
-        return "Observation: GIS Agent has completed it's work. This is the final answer."
+        return (f"Observation: GIS Agent has completed it's work. I should list the generated code file path, and "
+                f"generated visualization file path from the code output, if applicable."
+                f"Generated code path = {output.assembled_code_file_path}. "
+                f"Generated code output = {output.assembled_code_output}.")
 
     return Tool.from_function(func=gis_work_tool_func, name=GIS_WORK_TOOL, description=desc)

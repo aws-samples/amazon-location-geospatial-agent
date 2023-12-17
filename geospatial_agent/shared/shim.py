@@ -28,7 +28,9 @@ def get_data_file_url(file_path: str, session_id: str) -> str:
 
 def get_local_file_path(file_path: str, session_id: str, task_name: str = "") -> str:
     storage = LocalStorage()
-    return storage.get_generated_file_url(file_path=file_path, session_id=session_id, task_name=task_name)
+    file_url = storage.get_generated_file_url(file_path=file_path, session_id=session_id, task_name=task_name)
+    print(f"Resolved local file file_url = {file_url}")
+    return file_url
 
 
 class Storage(ABC):

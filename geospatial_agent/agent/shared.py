@@ -1,4 +1,6 @@
+import sys
 from enum import Enum, auto
+from io import StringIO
 from typing import TypeVar
 from datetime import datetime
 
@@ -58,3 +60,18 @@ class AgentSignal(BaseModel):
     event_data: T = Field(default=None)
     event_type: EventType = Field(default=EventType.Message)
     is_final: bool = Field(default=False)
+
+
+def execute_assembled_code(assembled_code):
+    """Executes the assembled code and returns the output."""
+    old_stdout = sys.stdout
+    redirected_output = sys.stdout = StringIO()
+    try:
+        exec(assembled_code, globals(), globals())
+    except Exception as e:
+        raise e
+    finally:
+        sys.stdout = old_stdout
+
+    output = redirected_output.getvalue()
+    return output, globals()
