@@ -10,7 +10,7 @@ import networkx as nx
 G = nx.DiGraph()
 # Add nodes and edges for the graph
 # Load covid 19 shapefile from remote source
-G.add_node("covid_19_shp_url", node_type="data", data_path="https://gepspatialagent.s3.amazonaws.com/data/covid_19_shapefile.zip", description="Covid 19 shapefile URL")
+G.add_node("covid_19_shp_url", node_type="data", data_path="agent://covid_19_shapefile.zip", description="Covid 19 shapefile URI")
 G.add_node("load_covid_19_shp", node_type="operation", description="Load Covid 19 shapefile")
 G.add_edge("covid_19_shp_url", "load_covid_19_shp")
 G.add_node("covid_19_gdf", node_type="data", description="Covid 19 shapefile GeoDataFrame")

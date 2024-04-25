@@ -63,7 +63,7 @@ operation_reply_example = """
 ```python'
 import pandas as pd
 
-def Load_csv(csv_url="https://genai-chatbotstack-chatbo-sessions3bucket24857fee-hrsqs54q10z4.s3.amazonaws.com/dd87ba06-242c-4a15-9e8d-5bfde1947077/data/data.csv"):
+def Load_csv(csv_url="https://someurl.amazonaws.com/dd87ba06-242c-4a15-9e8d-5bfde1947077/data/data.csv"):
     # Description: Load a CSV file from a given URL
     # csv_url: CSV file URL
     # Get downloadable url from csv_url
