@@ -52,13 +52,22 @@ class Storage(ABC):
 
 
 class LocalStorage(Storage):
+    @staticmethod
+    def _validate_path(resolved: str, base_dir: str) -> str:
+        abs_resolved = os.path.realpath(resolved)
+        abs_base = os.path.realpath(base_dir)
+        if not abs_resolved.startswith(abs_base + os.sep) and abs_resolved != abs_base:
+            raise ValueError(f"Path traversal detected: path escapes {abs_base}")
+        return abs_resolved
+
     def get_data_file_url(self, file_path: str, session_id: str) -> str:
         if file_path.startswith("agent://"):
             filename = file_path.removeprefix("agent://")
             root = self._get_root_folder()
-            return os.path.join(root, session_id, "data", filename)
+            base_dir = os.path.join(root, session_id, "data")
+            resolved = os.path.join(base_dir, filename)
+            return self._validate_path(resolved, base_dir)
         else:
-            # Check if the file path exists
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"File {file_path} not found")
             return file_path
@@ -67,12 +76,10 @@ class LocalStorage(Storage):
         if file_path.startswith("agent://"):
             file_path = file_path.removeprefix("agent://")
 
-        if not os.path.abspath(file_path):
-            raise ValueError("Generated file path must be absolute")
-
         root = self._get_root_folder()
-
-        return os.path.join(root, session_id, "generated", task_name, file_path)
+        base_dir = os.path.join(root, session_id, "generated", task_name)
+        resolved = os.path.join(base_dir, file_path)
+        return self._validate_path(resolved, base_dir)
 
     def write_file(self, file_name: str, session_id: str, task_name="", content="") -> str:
         if content == "":
